@@ -1,0 +1,9 @@
+export interface Cliente {
+  id: number;
+  nome: string;
+  email: string;
+  cpf: string;
+  telefone?: string;
+  dataNascimento?: string;
+  senha?: string;
+}
