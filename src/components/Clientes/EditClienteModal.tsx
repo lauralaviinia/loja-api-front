@@ -24,16 +24,14 @@ const EditarClienteModal: React.FC<EditarClienteModalProps> = ({
   onClose,
   onSave,
 }) => {
-  const [formData, setFormData] = useState<Cliente>(
-    cliente || {
-      id: 0,
-      nome: "",
-      email: "",
-      cpf: "",
-      telefone: "",
-      dataNascimento: "",
-    }
-  );
+  const [formData, setFormData] = useState<any>({
+    id: 0,
+    nome: "",
+    email: "",
+    cpf: "",
+    telefone: "",
+    dataNascimento: "",
+  });
 
   const [salvando, setSalvando] = useState(false);
 
@@ -41,14 +39,16 @@ const EditarClienteModal: React.FC<EditarClienteModalProps> = ({
     if (cliente && open) {
       setFormData({
         ...cliente,
-        dataNascimento: cliente.dataNascimento?.split("T")[0] || "",
+        dataNascimento: cliente.dataNascimento
+          ? cliente.dataNascimento.split("T")[0]
+          : "",
       });
     }
   }, [cliente, open]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData((prev: any) => ({
       ...prev,
       [name]: value,
     }));
@@ -57,8 +57,15 @@ const EditarClienteModal: React.FC<EditarClienteModalProps> = ({
   const handleSave = async () => {
     setSalvando(true);
     try {
-      await updateCliente(formData.id, formData);
-      onSave(formData);
+      const clienteAtualizado = await updateCliente(formData.id, {
+        nome: formData.nome,
+        email: formData.email,
+        cpf: formData.cpf,
+        telefone: formData.telefone,
+        dataNascimento: formData.dataNascimento,
+      });
+
+      onSave(clienteAtualizado);
       onClose();
     } catch (error) {
       console.error("Erro ao salvar cliente:", error);
@@ -82,7 +89,6 @@ const EditarClienteModal: React.FC<EditarClienteModalProps> = ({
             name="nome"
             value={formData.nome}
             onChange={handleInputChange}
-            placeholder="Digite o nome completo"
           />
 
           <TextField
@@ -92,7 +98,6 @@ const EditarClienteModal: React.FC<EditarClienteModalProps> = ({
             type="email"
             value={formData.email}
             onChange={handleInputChange}
-            placeholder="Digite o email"
           />
 
           <TextField
@@ -101,7 +106,6 @@ const EditarClienteModal: React.FC<EditarClienteModalProps> = ({
             name="cpf"
             value={formData.cpf}
             onChange={handleInputChange}
-            placeholder="Digite o CPF"
           />
 
           <TextField
@@ -110,16 +114,16 @@ const EditarClienteModal: React.FC<EditarClienteModalProps> = ({
             name="telefone"
             value={formData.telefone || ""}
             onChange={handleInputChange}
-            placeholder="Digite o telefone"
           />
 
           <TextField
             fullWidth
+            type="date"
+            InputLabelProps={{ shrink: true }}
             label="Data de Nascimento"
             name="dataNascimento"
-            value={formData.dataNascimento}
+            value={formData.dataNascimento || ""}
             onChange={handleInputChange}
-            placeholder="YYYY-MM-DD"
           />
         </Box>
       </DialogContent>

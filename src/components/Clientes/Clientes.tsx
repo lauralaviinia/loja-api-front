@@ -183,8 +183,9 @@ const Clientes: React.FC = () => {
       <CriarClienteModal
         open={modalCriarAberto}
         onClose={() => setModalCriarAberto(false)}
-        {...({ onSave: handleClienteCriado } as any)}
+        onClienteCriado={handleClienteCriado}
       />
+
     </Box>
   );
 };

@@ -1,56 +1,90 @@
 import axios from "axios";
 import type { Cliente } from "../types/cliente";
 
-const API_BASE = "http://localhost:3000"; // hook
+const API_BASE = "http://localhost:3000";
 
+// Remove senha antes de enviar ao front
+const mapCliente = (data: any): Cliente => {
+  const { senha, ...rest } = data;
+  return rest as Cliente;
+};
+
+// =======================================
 // Criar cliente
+// =======================================
 export const createCliente = async (dados: {
   nome: string;
   email: string;
   cpf: string;
-  telefone?: string;
+  telefone?: string | null;
   senha: string;
+  dataNascimento?: string | null;
 }): Promise<Cliente> => {
   const res = await axios.post(`${API_BASE}/clientes`, dados);
-  return res.data;
+  return mapCliente(res.data);
 };
 
-// Login cliente
+// =======================================
+// Login
+// =======================================
 export const loginCliente = async (email: string, senha: string) => {
   const res = await axios.post(`${API_BASE}/clientes/login`, { email, senha });
   return res.data;
 };
 
+// =======================================
 // Buscar todos
+// =======================================
 export const getClientes = async (): Promise<Cliente[]> => {
   const res = await axios.get(`${API_BASE}/clientes`);
-  return res.data;
+  return res.data.map((c: any) => mapCliente(c));
 };
 
+// =======================================
 // Buscar por ID
+// =======================================
 export const getClienteById = async (id: number): Promise<Cliente> => {
   const res = await axios.get(`${API_BASE}/clientes/${id}`);
-  return res.data;
+  return mapCliente(res.data);
 };
 
-// Atualizar cliente
+// =======================================
+// ATUALIZAR
+// =======================================
 export const updateCliente = async (
   id: number,
-  dados: Partial<Cliente>
+  dados: any
 ): Promise<Cliente> => {
+  const payload: any = {};
 
-  const payload = { ...dados };
+  // Envia apenas valores realmente alterados
+  if (dados.nome !== undefined) payload.nome = dados.nome;
+  if (dados.email !== undefined) payload.email = dados.email;
+  if (dados.cpf !== undefined) payload.cpf = dados.cpf;
 
-  // Só envia senha se realmente houver alteração
-  if (!payload.senha || payload.senha === "") {
-    delete payload.senha;
+  // TELEFONE — se "" vira null, se undefined nem envia
+  if (dados.telefone !== undefined) {
+    payload.telefone = dados.telefone?.trim() === "" ? null : dados.telefone;
+  }
+
+  // DATA — mesma lógica
+  if (dados.dataNascimento !== undefined) {
+    payload.dataNascimento =
+      dados.dataNascimento?.trim() === "" ? null : dados.dataNascimento;
+  }
+
+  // SENHA — só envia se NÃO estiver vazia
+  if (dados.senha && dados.senha.trim() !== "") {
+    payload.senha = dados.senha;
   }
 
   const res = await axios.put(`${API_BASE}/clientes/${id}`, payload);
-  return res.data;
+  return mapCliente(res.data);
 };
 
-// Deletar cliente
+// =======================================
+// Deletar
+// =======================================
 export const deleteCliente = async (id: number): Promise<void> => {
   await axios.delete(`${API_BASE}/clientes/${id}`);
 };

@@ -12,7 +12,7 @@ import clienteService from "../../services/clienteService";
 interface CriarClienteModalProps {
   open: boolean;
   onClose: () => void;
-  onClienteCriado: () => void;
+  onClienteCriado: (cliente: any) => void; // <--- PRECISA aceitar um cliente
 }
 
 const style = {
@@ -43,6 +43,17 @@ const CriarClienteModal: React.FC<CriarClienteModalProps> = ({
 
   const [error, setError] = useState("");
 
+  const resetForm = () => {
+    setNome("");
+    setEmail("");
+    setCpf("");
+    setTelefone("");
+    setDataNascimento("");
+    setSenha("");
+    setConfirmarSenha("");
+    setError("");
+  };
+
   const handleSalvar = async () => {
     setError("");
 
@@ -52,26 +63,31 @@ const CriarClienteModal: React.FC<CriarClienteModalProps> = ({
     }
 
     try {
-      await clienteService.createCliente({
+      // CAPTURA o cliente retornado pela API
+      const novoCliente = await clienteService.createCliente({
         nome,
         email,
         cpf,
         telefone,
         senha,
+        dataNascimento,
       });
 
-      onClienteCriado();
-      onClose();
+      // ENVIA o cliente criado para o componente pai
+      onClienteCriado(novoCliente);
 
-      setNome("");
-      setEmail("");
-      setCpf("");
-      setTelefone("");
-      setDataNascimento("");
-      setSenha("");
-      setConfirmarSenha("");
+      resetForm();
+      onClose();
     } catch (err: any) {
-      setError(err.response?.data?.message || "Erro ao criar cliente.");
+      console.error(err);
+
+      const mensagem =
+        err?.response?.data?.error ||
+        err?.response?.data?.message ||
+        err?.message ||
+        "Erro ao criar cliente.";
+
+      setError(mensagem);
     }
   };
 
@@ -83,35 +99,15 @@ const CriarClienteModal: React.FC<CriarClienteModalProps> = ({
         </Typography>
 
         <Stack spacing={2}>
-          <TextField
-            label="Nome"
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-            fullWidth
-          />
+          <TextField label="Nome" value={nome} onChange={(e) => setNome(e.target.value)} fullWidth />
 
-          <TextField
-            label="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            fullWidth
-          />
+          <TextField label="Email" value={email} onChange={(e) => setEmail(e.target.value)} fullWidth />
 
-          <TextField
-            label="CPF"
-            value={cpf}
-            onChange={(e) => setCpf(e.target.value)}
-            fullWidth
-          />
+          <TextField label="CPF" value={cpf} onChange={(e) => setCpf(e.target.value)} fullWidth />
 
-          <TextField
-            label="Telefone"
-            value={telefone}
-            onChange={(e) => setTelefone(e.target.value)}
-            fullWidth
-          />
+          <TextField label="Telefone" value={telefone} onChange={(e) => setTelefone(e.target.value)} fullWidth />
 
-          <TextField
+          <TextField 
             label="Data de Nascimento"
             value={dataNascimento}
             onChange={(e) => setDataNascimento(e.target.value)}
@@ -144,12 +140,7 @@ const CriarClienteModal: React.FC<CriarClienteModalProps> = ({
             </Typography>
           )}
 
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSalvar}
-            fullWidth
-          >
+          <Button variant="contained" color="primary" onClick={handleSalvar} fullWidth>
             Salvar
           </Button>
         </Stack>
