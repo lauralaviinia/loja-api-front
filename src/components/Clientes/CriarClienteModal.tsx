@@ -12,7 +12,7 @@ import clienteService from "../../services/clienteService";
 interface CriarClienteModalProps {
   open: boolean;
   onClose: () => void;
-  onClienteCriado: (cliente: any) => void; // <--- PRECISA aceitar um cliente
+  onClienteCriado: (cliente: any) => void;
 }
 
 const style = {
@@ -25,6 +25,44 @@ const style = {
   borderRadius: 2,
   boxShadow: 24,
   p: 4,
+};
+
+// =======================
+// Funções de validação
+// =======================
+const validarTelefone = (telefone: string) => {
+  if (!telefone) return true;
+
+  const apenasNums = telefone.replace(/\D/g, "");
+
+  if (apenasNums.length < 10 || apenasNums.length > 15) {
+    return "Telefone deve ter entre 10 e 15 dígitos.";
+  }
+
+  return true;
+};
+
+const validarDataNascimento = (data: string) => {
+  if (!data) return true;
+
+  const d = new Date(data);
+
+  if (isNaN(d.getTime())) {
+    return "Data de nascimento inválida.";
+  }
+
+  const ano = d.getUTCFullYear();
+
+  if (ano < 1900) {
+    return "Data mínima permitida é 01/01/1900.";
+  }
+
+  const hoje = new Date();
+  if (d > hoje) {
+    return "Data de nascimento não pode ser no futuro.";
+  }
+
+  return true;
 };
 
 const CriarClienteModal: React.FC<CriarClienteModalProps> = ({
@@ -57,13 +95,27 @@ const CriarClienteModal: React.FC<CriarClienteModalProps> = ({
   const handleSalvar = async () => {
     setError("");
 
+    // Senhas iguais
     if (senha !== confirmarSenha) {
       setError("As senhas não coincidem.");
       return;
     }
 
+    // Telefone válido
+    const telValido = validarTelefone(telefone);
+    if (telValido !== true) {
+      setError(telValido);
+      return;
+    }
+
+    // Data válida
+    const dataValida = validarDataNascimento(dataNascimento);
+    if (dataValida !== true) {
+      setError(dataValida);
+      return;
+    }
+
     try {
-      // CAPTURA o cliente retornado pela API
       const novoCliente = await clienteService.createCliente({
         nome,
         email,
@@ -73,21 +125,18 @@ const CriarClienteModal: React.FC<CriarClienteModalProps> = ({
         dataNascimento,
       });
 
-      // ENVIA o cliente criado para o componente pai
       onClienteCriado(novoCliente);
-
       resetForm();
       onClose();
     } catch (err: any) {
       console.error(err);
 
-      const mensagem =
+      setError(
         err?.response?.data?.error ||
-        err?.response?.data?.message ||
-        err?.message ||
-        "Erro ao criar cliente.";
-
-      setError(mensagem);
+          err?.response?.data?.message ||
+          err?.message ||
+          "Erro ao criar cliente."
+      );
     }
   };
 
@@ -109,29 +158,21 @@ const CriarClienteModal: React.FC<CriarClienteModalProps> = ({
 
           <TextField 
             label="Data de Nascimento"
-            value={dataNascimento}
-            onChange={(e) => setDataNascimento(e.target.value)}
             type="date"
             InputLabelProps={{ shrink: true }}
+            value={dataNascimento}
+            onChange={(e) => setDataNascimento(e.target.value)}
             fullWidth
           />
 
-          <TextField
-            label="Senha"
-            value={senha}
-            type="password"
-            onChange={(e) => setSenha(e.target.value)}
-            fullWidth
-            required
-          />
+          <TextField label="Senha" type="password" value={senha} onChange={(e) => setSenha(e.target.value)} fullWidth />
 
           <TextField
             label="Confirmar Senha"
-            value={confirmarSenha}
             type="password"
+            value={confirmarSenha}
             onChange={(e) => setConfirmarSenha(e.target.value)}
             fullWidth
-            required
           />
 
           {error && (

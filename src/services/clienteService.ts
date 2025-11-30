@@ -49,7 +49,7 @@ export const getClienteById = async (id: number): Promise<Cliente> => {
 };
 
 // =======================================
-// ATUALIZAR
+// Atualizar
 // =======================================
 export const updateCliente = async (
   id: number,
@@ -62,18 +62,18 @@ export const updateCliente = async (
   if (dados.email !== undefined) payload.email = dados.email;
   if (dados.cpf !== undefined) payload.cpf = dados.cpf;
 
-  // TELEFONE — se "" vira null, se undefined nem envia
+  // TELEFONE - se "" vira null, se undefined nem envia
   if (dados.telefone !== undefined) {
     payload.telefone = dados.telefone?.trim() === "" ? null : dados.telefone;
   }
 
-  // DATA — mesma lógica
+  // DATA - mesma lógica
   if (dados.dataNascimento !== undefined) {
     payload.dataNascimento =
       dados.dataNascimento?.trim() === "" ? null : dados.dataNascimento;
   }
 
-  // SENHA — só envia se NÃO estiver vazia
+  // SENHA - só envia se NÃO estiver vazia
   if (dados.senha && dados.senha.trim() !== "") {
     payload.senha = dados.senha;
   }
