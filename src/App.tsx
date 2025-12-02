@@ -7,9 +7,8 @@ import { useState } from "react";
 
 // Componentes
 import Clientes from "./components/Clientes/Clientes";
-import Produtos from "./components/Produtos/Produtos";
-//import Categoria from "./components/Categoria/Categoria";
-//import Pedidos from "./components/Pedidos/Pedidos";
+import Categorias from "./components/Categorias/Categorias";
+import Pedidos from "./components/Pedidos/Pedidos";
 
 function App() {
   const [mode, setMode] = useState<"light" | "dark">("light");
@@ -27,9 +26,8 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/home" element={<Home />} />
           <Route path="/clientes" element={<Clientes />} />
-          <Route path="/produtos" element={<Produtos/>} />
-          {/* <Route path="/categoria" element={<Categoria/>} /> */}
-          {/* <Route path="/pedidos" element={<Pedidos/>} /> */}
+          <Route path="/categorias" element={<Categorias/>} />
+          <Route path="/pedidos" element={<Pedidos/>} /> 
         </Routes>
       </Router>
     </ThemeProvider>

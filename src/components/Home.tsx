@@ -5,6 +5,7 @@ const AVATAR_SIZE = 72;
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
+
   return (
     <Box position="relative" minHeight="100vh" width="100vw">
       <Box
@@ -24,29 +25,39 @@ const Home: React.FC = () => {
                   height: AVATAR_SIZE,
                   bgcolor: "transparent",
                 }}
-                slotProps={{ img: { loading: "lazy" } }}
               />
             </Box>
+
             <Typography variant="h5" component="h1" fontWeight={600} mb={2}>
               Loja de Produtos
             </Typography>
+
             <Button
               variant="contained"
-              color="primary"
               fullWidth
               sx={{ mb: 2 }}
-              type="button"
               onClick={() => navigate("/clientes")}
             >
               Clientes
             </Button>
+
             <Button
               variant="contained"
               color="secondary"
               fullWidth
-              type="button"
+              sx={{ mb: 2 }}
+              onClick={() => navigate("/categorias")}
             >
               Categoria
+            </Button>
+
+            <Button
+              variant="contained"
+              color="success"
+              fullWidth
+              onClick={() => navigate("/pedidos")}
+            >
+              Pedidos
             </Button>
           </Box>
         </Paper>
