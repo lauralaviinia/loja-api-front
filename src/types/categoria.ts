@@ -2,7 +2,7 @@ export interface Categoria {
   id: number;
   nome: string;
   descricao?: string;
-  produtos?: Array<{
+  produto?: Array<{
     id: number;
     nome: string;
     preco: number;
