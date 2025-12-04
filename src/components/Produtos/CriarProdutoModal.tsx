@@ -74,6 +74,12 @@ const CriarProdutoModal: React.FC<CriarProdutoModalProps> = ({
       return setError("Informe o nome do produto.");
     }
 
+    // Validação: nome deve ter pelo menos 4 letras
+    const nomeApenasLetras = nome.replace(/\s/g, "");
+    if (nomeApenasLetras.length < 4) {
+      return setError("O nome do produto deve ter no mínimo 4 letras.");
+    }
+
     // Validação: nome não pode conter apenas números
     if (/^\d+$/.test(nome.trim())) {
       return setError("O nome do produto não pode ser apenas números.");
@@ -90,8 +96,25 @@ const CriarProdutoModal: React.FC<CriarProdutoModalProps> = ({
     }
 
     // Validação: descrição não pode ser apenas números (se fornecida)
-    if (descricao.trim() !== "" && /^\d+$/.test(descricao.trim())) {
-      return setError("A descrição não pode ser apenas números.");
+    if (descricao.trim() !== "") {
+      // descrição deve ter no mínimo 4 letras
+      const descApenasLetras = descricao.replace(/\s/g, "");
+      if (descApenasLetras.length < 4) {
+        return setError("A descrição deve ter no mínimo 4 letras.");
+      }
+
+      // não pode ser apenas números
+      if (/^\d+$/.test(descricao.trim())) {
+        return setError("A descrição não pode ser apenas números.");
+      }
+    }
+
+    // Validação: estoque não pode ser negativo (se fornecido)
+    if (estoque && estoque.trim() !== "") {
+      const estoqueNum = Number(estoque);
+      if (isNaN(estoqueNum) || estoqueNum < 0) {
+        return setError("O estoque não pode ser negativo.");
+      }
     }
 
     try {

@@ -103,14 +103,34 @@ const EditarProdutoModal: React.FC<EditarProdutoModalProps> = ({
     if (!formData.preco || Number(formData.preco) <= 0)
       return setErro("Preço inválido.");
 
+    // Validação: nome deve ter no mínimo 4 letras
+    const nomeApenasLetras = formData.nome.replace(/\s/g, "");
+    if (nomeApenasLetras.length < 4) {
+      return setErro("O nome do produto deve ter no mínimo 4 letras.");
+    }
+
     // Validação: nome não pode ser apenas números
     if (/^\d+$/.test(formData.nome.trim())) {
       return setErro("O nome do produto não pode ser apenas números.");
     }
 
-    // Validação: descrição não pode ser apenas números (se fornecida)
-    if (formData.descricao.trim() !== "" && /^\d+$/.test(formData.descricao.trim())) {
-      return setErro("A descrição não pode ser apenas números.");
+    // Validação: descrição (se fornecida) deve ter no mínimo 4 letras e não ser apenas números
+    if (formData.descricao.trim() !== "") {
+      const descApenasLetras = formData.descricao.replace(/\s/g, "");
+      if (descApenasLetras.length < 4) {
+        return setErro("A descrição deve ter no mínimo 4 letras.");
+      }
+      if (/^\d+$/.test(formData.descricao.trim())) {
+        return setErro("A descrição não pode ser apenas números.");
+      }
+    }
+
+    // Validação: estoque não pode ser negativo (se fornecido)
+    if (formData.estoque && formData.estoque.trim() !== "") {
+      const estoqueNum = Number(formData.estoque);
+      if (isNaN(estoqueNum) || estoqueNum < 0) {
+        return setErro("O estoque não pode ser negativo.");
+      }
     }
 
     // Validação: categoria obrigatória (não permitir editar para sem categoria)
