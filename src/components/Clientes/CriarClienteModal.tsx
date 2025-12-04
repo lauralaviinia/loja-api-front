@@ -9,6 +9,10 @@ import {
 } from "@mui/material";
 import clienteService from "../../services/clienteService";
 
+// =======================
+// Interface do componente
+// =======================
+
 interface CriarClienteModalProps {
   open: boolean;
   onClose: () => void;
@@ -30,6 +34,73 @@ const style = {
 // =======================
 // Funções de validação
 // =======================
+
+const validarNome = (nome: string) => {
+  if (!nome.trim()) return "Nome é obrigatório.";
+  
+
+  if (/\d/.test(nome)) {
+    return "Nome não pode conter números.";
+  }
+  
+
+  const apenasLetras = nome.replace(/\s/g, "");
+  if (apenasLetras.length < 4) {
+    return "Nome deve ter no mínimo 4 letras.";
+  }
+  
+  return true;
+};
+
+const validarEmail = (email: string) => {
+  if (!email.trim()) return "Email é obrigatório.";
+  
+  if (/^\d+$/.test(email)) {
+    return "Email não pode ser apenas números.";
+  }
+  
+  const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!regexEmail.test(email)) {
+    return "Email inválido. Use o formato: usuario@exemplo.com";
+  }
+  
+  return true;
+};
+
+const validarCpf = (cpf: string) => {
+  if (!cpf.trim()) return "CPF é obrigatório.";
+  
+  const apenasNums = cpf.replace(/\D/g, "");
+  
+  if (apenasNums !== cpf.trim() && cpf.trim().length > 0) {
+    return "CPF deve conter apenas números.";
+  }
+  
+  if (apenasNums.length !== 11) {
+    return "CPF deve ter exatamente 11 dígitos.";
+  }
+  
+  return true;
+};
+
+const validarSenha = (senha: string) => {
+  if (!senha.trim()) return "Senha é obrigatória.";
+  
+  if (senha.length < 4) {
+    return "A senha deve ter pelo menos 4 caracteres.";
+  }
+  
+  if (!/[a-zA-Z]/.test(senha)) {
+    return "A senha deve conter pelo menos uma letra.";
+  }
+  
+  if (!/[0-9]/.test(senha)) {
+    return "A senha deve conter pelo menos um número.";
+  }
+  
+  return true;
+};
+
 const validarTelefone = (telefone: string) => {
   if (!telefone) return true;
 
@@ -65,6 +136,10 @@ const validarDataNascimento = (data: string) => {
   return true;
 };
 
+// =======================
+// Componente principal
+// =======================
+
 const CriarClienteModal: React.FC<CriarClienteModalProps> = ({
   open,
   onClose,
@@ -92,8 +167,40 @@ const CriarClienteModal: React.FC<CriarClienteModalProps> = ({
     setError("");
   };
 
+  // =======================
+  // Função principal de salvar
+  // =======================
+
   const handleSalvar = async () => {
     setError("");
+
+    // Validar nome
+    const nomeValido = validarNome(nome);
+    if (nomeValido !== true) {
+      setError(nomeValido);
+      return;
+    }
+
+    // Validar email
+    const emailValido = validarEmail(email);
+    if (emailValido !== true) {
+      setError(emailValido);
+      return;
+    }
+
+    // Validar CPF
+    const cpfValido = validarCpf(cpf);
+    if (cpfValido !== true) {
+      setError(cpfValido);
+      return;
+    }
+
+    // Validar senha
+    const senhaValida = validarSenha(senha);
+    if (senhaValida !== true) {
+      setError(senhaValida);
+      return;
+    }
 
     // Senhas iguais
     if (senha !== confirmarSenha) {
@@ -101,31 +208,40 @@ const CriarClienteModal: React.FC<CriarClienteModalProps> = ({
       return;
     }
 
-    // Telefone válido
-    const telValido = validarTelefone(telefone);
-    if (telValido !== true) {
-      setError(telValido);
-      return;
+    // Telefone válido (opcional)
+    if (telefone && telefone.trim()) {
+      const telValido = validarTelefone(telefone);
+      if (telValido !== true) {
+        setError(telValido);
+        return;
+      }
     }
 
-    // Data válida
-    const dataValida = validarDataNascimento(dataNascimento);
-    if (dataValida !== true) {
-      setError(dataValida);
-      return;
+    // Data válida (opcional)
+    if (dataNascimento && dataNascimento.trim()) {
+      const dataValida = validarDataNascimento(dataNascimento);
+      if (dataValida !== true) {
+        setError(dataValida);
+        return;
+      }
     }
+
+    // ------ Envio ao backend ------
 
     try {
       const novoCliente = await clienteService.createCliente({
         nome,
         email,
         cpf,
-        telefone,
+        telefone: telefone.trim() ? telefone : null,
         senha,
-        dataNascimento,
+        dataNascimento: dataNascimento.trim() || "",
       });
 
+      // Retorna cliente ao componente pai
       onClienteCriado(novoCliente);
+
+      // Reseta campos e fecha modal
       resetForm();
       onClose();
     } catch (err: any) {
@@ -139,6 +255,10 @@ const CriarClienteModal: React.FC<CriarClienteModalProps> = ({
       );
     }
   };
+  
+  // =======================
+  // Renderização do modal
+  // =======================
 
   return (
     <Modal open={open} onClose={onClose}>
