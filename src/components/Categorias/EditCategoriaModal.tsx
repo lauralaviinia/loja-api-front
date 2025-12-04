@@ -78,9 +78,21 @@ const EditCategoriaModal: React.FC<EditCategoriaModalProps> = ({
       return;
     }
 
+    // Nome deve conter pelo menos 4 letras
+    if (formData.nome.trim().length < 4) {
+      setErro("O nome da categoria deve conter no mínimo 4 letras.");
+      return;
+    }
+
     // Nome não pode conter números
     if (/\d/.test(formData.nome)) {
       setErro("O nome da categoria não pode conter números.");
+      return;
+    }
+
+    // Descrição deve conter no mínimo 4 letras (se fornecida)
+    if (formData.descricao.trim() !== "" && formData.descricao.trim().length < 4) {
+      setErro("A descrição deve conter no mínimo 4 letras.");
       return;
     }
 

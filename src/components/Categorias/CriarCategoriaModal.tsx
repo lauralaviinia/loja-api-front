@@ -46,9 +46,21 @@ const CriarCategoriaModal: React.FC<CriarCategoriaModalProps> = ({
       return;
     }
 
+    // Nome deve conter pelo menos 4 letras
+    if (nome.trim().length < 4) {
+      setError("O nome da categoria deve conter no mínimo 4 letras.");
+      return;
+    }
+
     // Nome não deve conter números
     if (/\d/.test(nome)) {
       setError("O nome da categoria não pode conter números.");
+      return;
+    }
+
+    // Descrição deve conter no mínimo 4 letras (se fornecida)
+    if (descricao.trim() !== "" && descricao.trim().length < 4) {
+      setError("A descrição deve conter no mínimo 4 letras.");
       return;
     }
 
