@@ -131,7 +131,6 @@ const CriarPedidoModal: React.FC<CriarPedidoModalProps> = ({
     }
 
     try {
-      // --- MONTAR ITEMS NO FORMATO CORRETO ---
       const itemsPayload = items.map((item) => ({
         produtoId: item.produtoId,
         quantidade: item.quantidade,

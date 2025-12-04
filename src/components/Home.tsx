@@ -34,6 +34,7 @@ const Home: React.FC = () => {
 
             <Button
               variant="contained"
+              color="primary"
               fullWidth
               sx={{ mb: 2 }}
               onClick={() => navigate("/clientes")}
@@ -43,7 +44,7 @@ const Home: React.FC = () => {
 
             <Button
               variant="contained"
-              color="secondary"
+              color="info"
               fullWidth
               sx={{ mb: 2 }}
               onClick={() => navigate("/categorias")}
@@ -53,8 +54,18 @@ const Home: React.FC = () => {
 
             <Button
               variant="contained"
-              color="success"
+              color="secondary"
               fullWidth
+              sx={{ mb: 2 }}
+              onClick={() => navigate("/produtos")}
+            >
+              Produtos
+            </Button>
+
+            <Button
+              variant="contained"
+              fullWidth
+              sx={{ mb: 2, backgroundColor: "#B388EB" }}
               onClick={() => navigate("/pedidos")}
             >
               Pedidos

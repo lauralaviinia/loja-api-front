@@ -9,6 +9,7 @@ import { useState } from "react";
 import Clientes from "./components/Clientes/Clientes";
 import Categorias from "./components/Categorias/Categorias";
 import Pedidos from "./components/Pedidos/Pedidos";
+import Produtos from "./components/Produtos/Produtos";
 
 function App() {
   const [mode, setMode] = useState<"light" | "dark">("light");
@@ -27,6 +28,7 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/clientes" element={<Clientes />} />
           <Route path="/categorias" element={<Categorias/>} />
+          <Route path="/produtos" element={<Produtos />} />
           <Route path="/pedidos" element={<Pedidos/>} /> 
         </Routes>
       </Router>
