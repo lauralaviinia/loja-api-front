@@ -91,6 +91,13 @@ const CriarPedidoModal: React.FC<CriarPedidoModalProps> = ({
     const produto = produtos.find((p) => p.id === Number(produtoId));
     if (!produto) return;
 
+    // Verificar estoque disponível (se informado)
+    const estoqueDisponivel = typeof produto.estoque === "number" ? produto.estoque : 0;
+    if (quantidade > estoqueDisponivel) {
+      setError(`Quantidade maior que o estoque disponível (${estoqueDisponivel}).`);
+      return;
+    }
+
     const novoItem: PedidoItem = {
       id: Date.now(),
       pedidoId: 0,
@@ -196,7 +203,7 @@ const CriarPedidoModal: React.FC<CriarPedidoModalProps> = ({
             >
               {produtos.map((p) => (
                 <MenuItem key={p.id} value={p.id}>
-                  {p.nome} — R$ {p.preco.toFixed(2)}
+                  {p.nome} — R$ {p.preco.toFixed(2)} (estoque: {p.estoque ?? 0})
                 </MenuItem>
               ))}
             </TextField>
@@ -208,6 +215,17 @@ const CriarPedidoModal: React.FC<CriarPedidoModalProps> = ({
               onChange={(e) => setQuantidade(Number(e.target.value))}
               sx={{ width: 120 }}
             />
+
+            {/* Mostrar estoque do produto selecionado */}
+            <Box sx={{ display: "flex", alignItems: "center", px: 1 }}>
+              <Typography variant="body2" color="text.secondary">
+                {produtoId
+                  ? `Em estoque: ${
+                      (produtos.find((p) => p.id === Number(produtoId))?.estoque ?? 0)
+                    }`
+                  : ""}
+              </Typography>
+            </Box>
 
             <Button variant="contained" onClick={handleAddItem}>
               Adicionar
@@ -229,7 +247,16 @@ const CriarPedidoModal: React.FC<CriarPedidoModalProps> = ({
             <TableBody>
               {items.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell>{item.produto?.nome}</TableCell>
+                  <TableCell>
+                    <div>
+                      <div>{item.produto?.nome}</div>
+                      <div>
+                        <Typography variant="caption" color="text.secondary">
+                          Em estoque: {(item.produto as any)?.estoque ?? 0}
+                        </Typography>
+                      </div>
+                    </div>
+                  </TableCell>
                   <TableCell align="center">{item.quantidade}</TableCell>
                   <TableCell align="center">
                     R$ {(item.produto?.preco || 0).toFixed(2)}

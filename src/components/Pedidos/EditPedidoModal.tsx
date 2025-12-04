@@ -117,8 +117,15 @@ const EditarPedidoModal: React.FC<EditarPedidoModalProps> = ({
     const produtoSelect = produtos.find((p) => p.id === Number(produtoId));
     if (!produtoSelect) return;
 
+    // Verificar estoque disponível
+    const estoqueDisponivel = typeof produtoSelect.estoque === "number" ? produtoSelect.estoque : 0;
+    if (quantidade > estoqueDisponivel) {
+      setErro(`Quantidade maior que o estoque disponível (${estoqueDisponivel}).`);
+      return;
+    }
+
     const novoItem: PedidoItem = {
-      id: Math.random(), // ❗Corrigido para ID único local
+      id: Math.random(), 
       pedidoId: formData.id,
       produtoId: produtoSelect.id,
       quantidade,
@@ -148,12 +155,25 @@ const EditarPedidoModal: React.FC<EditarPedidoModalProps> = ({
   // Alterar quantidade
   // =========================================================
   const handleChangeQtd = (id: number, value: number) => {
-    setFormData((prev: any) => ({
-      ...prev,
-      items: prev.items.map((it: PedidoItem) =>
-        it.id === id ? { ...it, quantidade: value } : it
-      ),
-    }));
+    setFormData((prev: any) => {
+      const updatedItems = prev.items.map((it: PedidoItem) => {
+        if (it.id !== id) return it;
+
+        const estoqueDisponivel = (it.produto as Produto)?.estoque ?? 0;
+        const novaQtd = Math.max(1, value);
+
+        if (novaQtd > estoqueDisponivel) {
+          setErro(`Quantidade maior que o estoque disponível (${estoqueDisponivel}).`);
+          return { ...it, quantidade: estoqueDisponivel };
+        }
+
+        // limpar erro se ok
+        setErro("");
+        return { ...it, quantidade: novaQtd };
+      });
+
+      return { ...prev, items: updatedItems };
+    });
   };
 
   // =========================================================
@@ -243,7 +263,7 @@ const EditarPedidoModal: React.FC<EditarPedidoModalProps> = ({
             >
               {produtos.map((p) => (
                 <MenuItem key={p.id} value={p.id}>
-                  {p.nome} — R$ {p.preco.toFixed(2)}
+                  {p.nome} — R$ {p.preco.toFixed(2)} (estoque: {p.estoque ?? 0})
                 </MenuItem>
               ))}
             </TextField>
@@ -257,6 +277,17 @@ const EditarPedidoModal: React.FC<EditarPedidoModalProps> = ({
                 setQuantidade(Math.max(1, Number(e.target.value)))
               }
             />
+
+            {/* Mostrar estoque do produto selecionado */}
+            <Box sx={{ display: "flex", alignItems: "center", px: 1 }}>
+              <Typography variant="body2" color="text.secondary">
+                {produtoId
+                  ? `Em estoque: ${
+                      (produtos.find((p) => p.id === Number(produtoId))?.estoque ?? 0)
+                    }`
+                  : ""}
+              </Typography>
+            </Box>
 
             <Button variant="contained" onClick={handleAddItem}>
               Adicionar
@@ -277,7 +308,16 @@ const EditarPedidoModal: React.FC<EditarPedidoModalProps> = ({
             <TableBody>
               {formData.items.map((item: PedidoItem) => (
                 <TableRow key={item.id}>
-                  <TableCell>{item.produto?.nome}</TableCell>
+                  <TableCell>
+                    <div>
+                      <div>{item.produto?.nome}</div>
+                      <div>
+                        <Typography variant="caption" color="text.secondary">
+                          Em estoque: {(item.produto as Produto)?.estoque ?? 0}
+                        </Typography>
+                      </div>
+                    </div>
+                  </TableCell>
 
                   <TableCell align="center">
                     <TextField
