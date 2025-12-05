@@ -7,7 +7,7 @@
 node_modules/
 
 # Compile output
-dist/
+# dist/ -> deve ser enviado para o Git no Render Static Site
 build/
 out/
 lib/
@@ -27,7 +27,7 @@ logs/
 .env
 .env.local
 .env.development
-.env.production
+# .env.production -> usado no build do Vite
 .env.test
 
 # OS files
