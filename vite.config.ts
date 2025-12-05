@@ -9,7 +9,7 @@ export default defineConfig({
       // Redireciona chamadas iniciadas com /api para o backend em localhost:3000
       // e remove o prefixo /api antes de enviar. Ajuste o target se necessário.
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'https://loja-api-back.onrender.com',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, ''),
