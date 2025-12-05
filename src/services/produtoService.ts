@@ -1,8 +1,6 @@
 import axios from "axios";
 import type { Produto } from "../types/produto";
 
-const API_BASE = "http://localhost:3000";
-
 // Buscar todos os produtos
 export const getProdutos = async (): Promise<Produto[]> => {
   const res = await axios.get<Produto[]>(`${API_BASE}/produtos`);
