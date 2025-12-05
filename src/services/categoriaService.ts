@@ -1,8 +1,6 @@
 import axios from "axios";
 import type { Categoria } from "../types/categoria";
 
-const API_BASE = "http://localhost:3000";
-
 // ===============================
 // Mapeamento
 // ===============================
