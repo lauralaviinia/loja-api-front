@@ -1,8 +1,6 @@
 import axios from "axios";
 import type { Cliente } from "../types/cliente";
 
-const API_BASE = "http://localhost:3000";
-
 // Remove senha antes de enviar ao front
 const mapCliente = (data: any): Cliente => {
   const { senha, ...rest } = data;
